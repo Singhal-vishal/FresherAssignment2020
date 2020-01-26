@@ -1,6 +1,7 @@
 package com.newsletter.services;
 
 import com.newsletter.bos.NewsletterBo;
+import com.newsletter.exceptions.NewsletterNotFoundException;
 import java.util.List;
 
 public interface INewsletterService {
@@ -9,7 +10,7 @@ public interface INewsletterService {
 
   void saveNewsletter(NewsletterBo dto);
 
-  void editNewsletter(NewsletterBo dto);
+  void editNewsletter(NewsletterBo dto) throws NewsletterNotFoundException;
 
   boolean deleteNewsletter(int id);
 

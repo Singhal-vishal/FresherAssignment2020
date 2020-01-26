@@ -32,19 +32,19 @@ public abstract class NewsletterModel {
     this.name = name;
   }
 
-  public float getDailyprice() {
+  public float getDailyPrice() {
     return dailyprice;
   }
 
-  public void setDailyprice(float dailyprice) {
+  public void setDailyPrice(float dailyprice) {
     this.dailyprice = dailyprice;
   }
 
-  public float getWeeklyprice() {
+  public float getWeeklyPrice() {
     return weeklyprice;
   }
 
-  public void setWeeklyprice(float weeklyprice) {
+  public void setWeeklyPrice(float weeklyprice) {
     this.weeklyprice = weeklyprice;
   }
 

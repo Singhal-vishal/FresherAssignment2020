@@ -15,32 +15,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SubscriptionTransactionServiceImpl implements SubscriptionTransactionService {
 
   @Autowired
-  private static SubscriptionRepository subscriptionRepository;
+  private SubscriptionRepository subscriptionRepository;
 
   @Autowired
-  private static SubscriptionObjectMapper subscriptionObjectMapper;
+  private SubscriptionObjectMapper subscriptionObjectMapper;
 
   private static final Logger logger = Logger
       .getLogger(SubscriptionTransactionServiceImpl.class.getName());
 
   @Override
+  @Transactional
   public List<SubscriptionBo> getAllSubscriptions() {
     List<SubscriptionEntity> subscriptionEntityList = subscriptionRepository.findAll();
     return subscriptionObjectMapper.subscriptionBoFromEntityList(subscriptionEntityList);
   }
 
   @Override
+  @Transactional
   public void buyASubscription(SubscriptionBo subscriptionBo) {
     SubscriptionEntity subscriptionEntity = subscriptionObjectMapper.boToEntity(subscriptionBo);
     subscriptionRepository.save(subscriptionEntity);
   }
 
   @Override
+  @Transactional
   public boolean cancelSubscription(long id) {
     Optional<SubscriptionEntity> s = subscriptionRepository.findById(id);
     if (s.isPresent()) {
@@ -55,6 +59,7 @@ public class SubscriptionTransactionServiceImpl implements SubscriptionTransacti
   }
 
   @Override
+  @Transactional
   public boolean renewSubscription(long id, Date date, String dailyweekly) {
     Optional<SubscriptionEntity> s = subscriptionRepository.findById(id);
     if (s.isPresent()) {
@@ -96,6 +101,7 @@ public class SubscriptionTransactionServiceImpl implements SubscriptionTransacti
   }
 
   @Override
+  @Transactional
   public List<SubscriptionBo> getSortedSubscriptions(String type, String sortOrder) {
     List<SubscriptionBo> sortedSubscriptionBoList = sortSubscriptions(type);
     if (sortOrder.equalsIgnoreCase("asc")) {
@@ -106,6 +112,7 @@ public class SubscriptionTransactionServiceImpl implements SubscriptionTransacti
   }
 
   @Override
+  @Transactional
   public List<SubscriptionBo> sortSubscriptions(String type) {
     List<SubscriptionEntity> allSubscriptionBos = subscriptionRepository.findAll();
     switch (type) {
@@ -128,6 +135,7 @@ public class SubscriptionTransactionServiceImpl implements SubscriptionTransacti
   }
 
   @Override
+  @Transactional
   public List<SubscriptionBo> getMySubscriptions(String email) {
     return subscriptionObjectMapper
         .subscriptionBoFromEntityList(subscriptionRepository.findByEmail(email));

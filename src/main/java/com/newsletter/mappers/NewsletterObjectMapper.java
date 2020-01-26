@@ -4,7 +4,9 @@ import com.newsletter.bos.NewsletterBo;
 import com.newsletter.dtos.NewsletterDto;
 import com.newsletter.entities.NewsletterEntity;
 import java.util.List;
+import org.mapstruct.Mapper;
 
+@Mapper(componentModel = "spring")
 public interface NewsletterObjectMapper {
 
   NewsletterBo dtoToBo(NewsletterDto newsletterDto);

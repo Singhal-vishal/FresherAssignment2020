@@ -1,8 +1,9 @@
 package com.newsletter.controllers;
 
 import com.newsletter.bos.NewsletterBo;
-import com.newsletter.constants.Constants;
+import com.newsletter.constants.NewsletterConstants;
 import com.newsletter.dtos.NewsletterDto;
+import com.newsletter.exceptions.NewsletterNotFoundException;
 import com.newsletter.mappers.NewsletterObjectMapper;
 import com.newsletter.services.impl.NewsletterServiceImpl;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class NewsletterController {
 
   @Autowired
-  private static NewsletterServiceImpl service;
+  private NewsletterServiceImpl service;
 
   @Autowired
   private static NewsletterObjectMapper newsletterObjectMapper;
@@ -36,10 +37,10 @@ public class NewsletterController {
    *
    * @return the all newsletters
    */
-  @GetMapping(path = "/getAllNewslettersDetails")
-  public List<NewsletterDto> getAllNewsletters() {
-    return newsletterObjectMapper
-        .getSubscriptionResponseFromBoList(service.getAllNewslettersDetails());
+  @GetMapping(path = "/get-all-newsletter-details")
+  public ResponseEntity<List<NewsletterDto>> getAllNewsletters() {
+    return new ResponseEntity<>(newsletterObjectMapper
+        .getSubscriptionResponseFromBoList(service.getAllNewslettersDetails()),HttpStatus.OK);
   }
 
   /**
@@ -47,7 +48,7 @@ public class NewsletterController {
    *
    * @param dto the dto
    */
-  @PostMapping(path = "/addNewsletter")
+  @PostMapping(path = "/add-newsletter")
   public void addNewsletter(@RequestBody NewsletterDto dto) {
     service.saveNewsletter(newsletterObjectMapper.dtoToBo(dto));
   }
@@ -57,8 +58,8 @@ public class NewsletterController {
    *
    * @param dto the dto
    */
-  @PutMapping(path = "/editNewsletter")
-  public void editNewsletter(@RequestBody NewsletterDto dto) {
+  @PutMapping(path = "/edit-newslette")
+  public void editNewsletter(@RequestBody NewsletterDto dto) throws NewsletterNotFoundException {
     service.editNewsletter(newsletterObjectMapper.dtoToBo(dto));
   }
 
@@ -68,13 +69,13 @@ public class NewsletterController {
    * @param id the id
    * @return the response entity
    */
-  @DeleteMapping(path = "/deleteNewsletter/{id}")
+  @DeleteMapping(path = "/delete-newsletter/{id}")
   public ResponseEntity<String> deleteNewsletter(@PathVariable int id) {
     boolean response = service.deleteNewsletter(id);
     if (response) {
-      return new ResponseEntity<>("Successfull deleted", HttpStatus.OK);
+      return new ResponseEntity<>(NewsletterConstants.SUCCESSFULLY_DELETED, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>("Id does not exist. Please re-check it.",
+      return new ResponseEntity<>(NewsletterConstants.ID_DOESNOT_EXIST,
           HttpStatus.BAD_REQUEST);
     }
   }
@@ -86,14 +87,14 @@ public class NewsletterController {
    * @param id           the id
    * @return the response entity
    */
-  @PutMapping(path = "/addContent")
+  @PutMapping(path = "/add-content")
   public ResponseEntity<String> addContent(@RequestBody NewsletterBo newsletterBo,
       @RequestParam("id") int id) {
-    boolean response = service.addContent(id, newsletterBo);
+    final boolean response = service.addContent(id, newsletterBo);
     if (response) {
-      return new ResponseEntity<>(Constants.SUCCESS_ADDED, HttpStatus.OK);
+      return new ResponseEntity<>(NewsletterConstants.SUCCESS_ADDED, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>("Type does not exist. Please re-check it.",
+      return new ResponseEntity<>(NewsletterConstants.BAD_REQUEST,
           HttpStatus.BAD_REQUEST);
     }
   }

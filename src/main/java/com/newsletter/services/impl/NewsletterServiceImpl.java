@@ -1,6 +1,7 @@
 package com.newsletter.services.impl;
 
 import com.newsletter.bos.NewsletterBo;
+import com.newsletter.exceptions.NewsletterNotFoundException;
 import com.newsletter.services.INewsletterService;
 import com.newsletter.services.transactions.impl.NewsletterTransactionServiceImpl;
 import java.util.List;
@@ -25,7 +26,7 @@ public class NewsletterServiceImpl implements INewsletterService {
   }
 
   @Override
-  public void editNewsletter(NewsletterBo newsletterBo) {
+  public void editNewsletter(NewsletterBo newsletterBo) throws NewsletterNotFoundException {
     newsletterTransactionService.editNewsletter(newsletterBo);
   }
 

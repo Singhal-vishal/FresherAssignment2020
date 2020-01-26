@@ -1,6 +1,7 @@
 package com.newsletter.controllers;
 
 import com.newsletter.bos.SubscriptionBo;
+import com.newsletter.constants.SubscriptionConstants;
 import com.newsletter.dtos.SubscriptionDto;
 import com.newsletter.mappers.SubscriptionObjectMapper;
 import com.newsletter.services.impl.SubscriptionServiceImpl;
@@ -27,18 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubscriptionController {
 
   @Autowired
-  private static SubscriptionServiceImpl subscriptionService;
+  private SubscriptionServiceImpl subscriptionService;
 
- 
+
   @Autowired
   private static SubscriptionObjectMapper subscriptionObjectMapper;
+
 
   /**
    * Gets all subscriptions.
    *
    * @return the all subscriptions
    */
-  @GetMapping(path = "/getAllSubscriptions")
+  @GetMapping(path = "/get-all-subscriptions")
   public List<SubscriptionDto> getAllSubscriptions() {
     List<SubscriptionBo> allSubscriptions = subscriptionService.getAllSubscriptions();
     return subscriptionObjectMapper.getSubscriptionResponseFromBoList(allSubscriptions);
@@ -50,10 +52,10 @@ public class SubscriptionController {
    * @param subscriptionDto the subscription dto
    * @return the response entity
    */
-  @PostMapping(path = "/buyASubscription")
+  @PostMapping(path = "/buy-a-subscription")
   public ResponseEntity<String> buyASubscription(@RequestBody SubscriptionDto subscriptionDto) {
     subscriptionService.buyASubscription(subscriptionObjectMapper.dtoToBo(subscriptionDto));
-    return new ResponseEntity<>("Successfully bought.", HttpStatus.OK);
+    return new ResponseEntity<>(SubscriptionConstants.SUCCESSFULLY_BOUGHT, HttpStatus.OK);
   }
 
   /**
@@ -62,13 +64,13 @@ public class SubscriptionController {
    * @param id the id
    * @return the response entity
    */
-  @PutMapping(path = "/cancelSubscription/{id}")
+  @PutMapping(path = "/cancel-subscription/{id}")
   public ResponseEntity<String> cancelSubscription(@PathVariable long id) {
     boolean response = subscriptionService.cancelSubscription(id);
     if (response) {
-      return new ResponseEntity<>("Successfully canceled.", HttpStatus.OK);
+      return new ResponseEntity<>(SubscriptionConstants.SUCCESSFULLY_DONE, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>("Sorry try again later.", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(SubscriptionConstants.TRY_LATER, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -80,15 +82,15 @@ public class SubscriptionController {
    * @param date        the date
    * @return the response entity
    */
-  @PutMapping(path = "/renewSubscription/{id}/{dailyweekly}")
+  @PutMapping(path = "/re-new-subscription/{id}/{dailyweekly}")
   public ResponseEntity<String> renewSubscription(@PathVariable long id,
       @PathVariable String dailyweekly,
       @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
     boolean response = subscriptionService.renewSubscription(id, date, dailyweekly);
     if (response) {
-      return new ResponseEntity<>("Successfully canceled.", HttpStatus.OK);
+      return new ResponseEntity<>(SubscriptionConstants.SUCCESSFULLY_DONE, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>("Sorry try again later.", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(SubscriptionConstants.TRY_LATER, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -98,9 +100,10 @@ public class SubscriptionController {
    * @param filterType the filter type
    * @return the list
    */
-  @GetMapping(path = "/filterSubscriptions")
+  @GetMapping(path = "/filter-subscriptions")
   public List<SubscriptionDto> filterSubscriptions(@RequestParam String filterType) {
-    List<SubscriptionBo> subscriptionOfType = subscriptionService.getSubscriptionOfType(filterType);
+    final List<SubscriptionBo> subscriptionOfType =
+        subscriptionService.getSubscriptionOfType(filterType);
     return subscriptionObjectMapper.getSubscriptionResponseFromBoList(subscriptionOfType);
   }
 
@@ -111,9 +114,9 @@ public class SubscriptionController {
    * @param sortType the sort type
    * @return the sorted subscription
    */
-  @GetMapping(path = "/sortSubscriptions")
-  public List<SubscriptionDto> getSortedSubscription(@RequestParam String type,
-      @RequestParam String sortType) {
+  @GetMapping(path = "/sort-subscriptions")
+  public List<SubscriptionDto> getSortedSubscription(@RequestParam final String type,
+      @RequestParam final String sortType) {
     return subscriptionObjectMapper.getSubscriptionResponseFromBoList(
         subscriptionService.getSortedSubscriptions(type, sortType));
   }
@@ -122,7 +125,7 @@ public class SubscriptionController {
   /**
    * Send content through email.
    */
-  @Scheduled(cron = "0 28 22 * * ?")
+  @Scheduled(cron = SubscriptionConstants.CRON)
   public void sendContentThroughEmail() {
     subscriptionService.sendContentThroughEmail();
   }
@@ -133,7 +136,7 @@ public class SubscriptionController {
    * @param email the email
    * @return the my subscriptions
    */
-  @GetMapping(path = "/getMySubscriptions")
+  @GetMapping(path = "/get-user-all-subscriptions")
   public List<SubscriptionDto> getMySubscriptions(@RequestParam String email) {
     return subscriptionObjectMapper
         .getSubscriptionResponseFromBoList(subscriptionService.getMySubscriptions(email));
